@@ -148,6 +148,23 @@ void reconnect() {
   }
 }
 
+boolean reconnect_non_blocking() {
+  if (mqttClient.connect(STATION)) {
+    Serial.println("Connected!");
+    // Once connected, publish an announcement...
+    mqttClient.publish(STATION, "CONNECTED");
+
+    // Subscribe to each station topic
+    for (int i = 0; i < NUM_STATIONS; i++) {
+      mqttClient.subscribe(stations[i]);
+    }
+  } else {
+    Serial.print("failed, rc=");
+    Serial.print(mqttClient.state());
+  }
+  return mqttClient.connected();
+}
+
 void messageReceived(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);  
@@ -163,6 +180,7 @@ void messageReceived(char* topic, byte* payload, unsigned int length) {
   Serial.println(payloadArr);  // null terminated array
 }
 
+long lastReconnectAttempt = 0;
 void setup() {
   // Initialize serial communication:
   Serial.begin(9600);
@@ -178,13 +196,22 @@ void setup() {
     pinMode(activePins[i], OUTPUT);
     currentStates[i] = IDLE_STATE;
   }
+  lastReconnectAttempt = 0;
 }
 
 void loop() {
   if (!mqttClient.connected()) {
-    reconnect();
+    long now = millis();
+    if (now - lastReconnectAttempt > 5000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (reconnect_non_blocking()) {
+        lastReconnectAttempt = 0;
+      }
+    }
+  } else {
+    mqttClient.loop();
   }
-  mqttClient.loop();
 
   // Run each statin through the state machine
   for (int i = 0; i < NUM_STATIONS; i++) {
