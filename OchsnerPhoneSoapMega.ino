@@ -2,20 +2,82 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
-// Update these with values suitable for the hardware/network.
-byte mac[] = { 0x30, 0x8E, 0xB9, 0xC4, 0x47, 0x16 };
-IPAddress ip(192, 168, 1, 97);
-
-// Presence States
+/************* PRESENCE STATES *************/
 #define ACTIVE_STATE 0
 #define IDLE_STATE 1
 
-#define NUM_STATIONS 4                // The number of stations
 
-// The Client ID for connecting to the MQTT Broker
-const char CLIENT_ID = 'phoneSoap1';
+#define NUM_STATIONS 4
 
-// Station Pins
+/************* MQTT CONNECTION *************/
+const int mqttPort = 1883;
+const char* mqttServer = "192.168.2.10";
+
+/************ NETWORK CONNECTION ***********/
+IPAddress PS_T_IP(192, 168, 1, 97);
+byte PS_T_MAC[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 }
+IPAddress PS_W_IP(192, 168, 1, 98);
+byte PS_W_MAC[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 }
+IPAddress PS_O_IP(192, 168, 1, 99);
+byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 }
+
+/*************** MQTT TOPICS ***************/
+const char* T1_TOPIC = "phoneSoap/t1";
+const char* T2_TOPIC = "phoneSoap/t2";
+const char* T3_TOPIC = "phoneSoap/t3";
+const char* T4_TOPIC = "phoneSoap/t4";
+
+const char* W1_TOPIC = "phoneSoap/w1";
+const char* W2_TOPIC = "phoneSoap/w2";
+const char* W3_TOPIC = "phoneSoap/w3";
+const char* W4_TOPIC = "phoneSoap/w4";
+
+const char* O1_TOPIC = "phoneSoap/o1";
+const char* O2_TOPIC = "phoneSoap/o2";
+const char* O3_TOPIC = "phoneSoap/o3";
+const char* O4_TOPIC = "phoneSoap/o4";
+
+/******** MQTT PHONE SOAP STATIONS *********/
+/*
+ * 
+ * *** SET STATION BELOW ***
+ * ****** THIS IS REQUIRED ******
+ *
+ */
+const char* STATION_T = "PS_T";
+// const char* STATION_W = "PS_W";
+// const char* STATION_O = "PS_O";
+
+#if defined(STATION_T)
+  #define STATION STATION_T;
+  #define ip PS_T_IP;
+  #define mac PS_T_MAC;
+  const char* STATION = STATION_T;
+  const char* PS1_TOPIC = T1_TOPIC;
+  const char* PS2_TOPIC = T2_TOPIC;
+  const char* PS3_TOPIC = T3_TOPIC;
+  const char* PS4_TOPIC = T4_TOPIC;
+#elif defined(STATION_W)
+  #define STATION STATION_W;
+  #define ip PS_W_IP;
+  #define mac PS_W_MAC;
+  const char* PS1_TOPIC = W1_TOPIC;
+  const char* PS2_TOPIC = W2_TOPIC;
+  const char* PS3_TOPIC = W3_TOPIC;
+  const char* PS4_TOPIC = W4_TOPIC;
+#elif defined(STATION_O)
+  #define STATION STATION_O;
+  #define ip PS_O_IP;
+  #define mac PS_O_MAC;
+  const char* PS1_TOPIC = O1_TOPIC;
+  const char* PS2_TOPIC = O2_TOPIC;
+  const char* PS3_TOPIC = O3_TOPIC;
+  const char* PS4_TOPIC = O4_TOPIC;
+#endif
+
+
+
+/************** STATION PINS **************/
 const int PS1_sensorPin = 23;          // The phone soap input pin for PS1 (INPUT)
 const int PS1_activePin = 22;          // The ACTIVE state pin to trigger the PS1 matrix/teensy (OUTPUT)
 
@@ -28,21 +90,21 @@ const int PS3_activePin = 26;          // The ACTIVE state pin to trigger the PS
 const int PS4_sensorPin = 29;          // The phone soap input pin for PS4 (INPUT)
 const int PS4_activePin = 28;          // The ACTIVE state pin to trigger the PS4 matrix/teensy (OUTPUT)
 
-// Initialize the current state for each station
+
+/******** INITIALIZE CURRENT STATE ********/
 int PS1_currentState;
 int PS2_currentState;
 int PS3_currentState;
 int PS4_currentState;
 
-// Initialize the ethernet library
+
+/******* INITIALIZE ETHERNET LIBRARY *******/
 EthernetClient net;
-// Initialize the MQTT library
+/********* INITIALIZE MQTT LIBRARY *********/
 PubSubClient mqttClient(net);
 
-const char* mqttServer = "192.168.1.69";
-
 // Station names, used as MQTT Topics
-const char stations[NUM_STATIONS][10] = {"PS1", "PS2", "PS3", "PS4"};
+const char stations[NUM_STATIONS][10] = {PS1_TOPIC, PS2_TOPIC, PS3_TOPIC, PS4_TOPIC};
 
 // Station states, used as MQTT Messages
 const char states[2][10] = {"ACTIVE", "IDLE"};
@@ -59,7 +121,7 @@ void reconnect() {
   while (!mqttClient.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect with the client ID
-    if (mqttClient.connect(CLIENT_ID)) {
+    if (mqttClient.connect(STATION)) {
         Serial.println("Connected!");
         // Once connected, publish an announcement...
         mqttClient.publish(CLIENT_ID, "CONNECTED");
