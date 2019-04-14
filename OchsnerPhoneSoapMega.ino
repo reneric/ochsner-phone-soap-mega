@@ -25,20 +25,20 @@ IPAddress ip;
 byte mac[sizeof(PS_T_MAC)];
 
 /*************** MQTT TOPICS ***************/
-const char* T1_TOPIC = "phoneSoap/t1";
-const char* T2_TOPIC = "phoneSoap/t2";
-const char* T3_TOPIC = "phoneSoap/t3";
-const char* T4_TOPIC = "phoneSoap/t4";
+const char* T1_TOPIC = "phoneSoap/PS_T1";
+const char* T2_TOPIC = "phoneSoap/PS_T2";
+const char* T3_TOPIC = "phoneSoap/PS_T3";
+const char* T4_TOPIC = "phoneSoap/PS_T4";
 
-const char* W1_TOPIC = "phoneSoap/w1";
-const char* W2_TOPIC = "phoneSoap/w2";
-const char* W3_TOPIC = "phoneSoap/w3";
-const char* W4_TOPIC = "phoneSoap/w4";
+const char* W1_TOPIC = "phoneSoap/PS_W1";
+const char* W2_TOPIC = "phoneSoap/PS_W2";
+const char* W3_TOPIC = "phoneSoap/PS_W3";
+const char* W4_TOPIC = "phoneSoap/PS_W4";
 
-const char* O1_TOPIC = "phoneSoap/o1";
-const char* O2_TOPIC = "phoneSoap/o2";
-const char* O3_TOPIC = "phoneSoap/o3";
-const char* O4_TOPIC = "phoneSoap/o4";
+const char* O1_TOPIC = "phoneSoap/PS_O1";
+const char* O2_TOPIC = "phoneSoap/PS_O2";
+const char* O3_TOPIC = "phoneSoap/PS_O3";
+const char* O4_TOPIC = "phoneSoap/PS_O4";
 
 char* STATION;
 char PS1_TOPIC;
