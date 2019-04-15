@@ -15,27 +15,36 @@ const char* mqttServer = "192.168.2.10";
 
 /************ NETWORK CONNECTION ***********/
 IPAddress PS_T_IP(192, 168, 1, 97);
-byte PS_T_MAC[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 }
+byte PS_T_MAC[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
 IPAddress PS_W_IP(192, 168, 1, 98);
-byte PS_W_MAC[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 }
+byte PS_W_MAC[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 };
 IPAddress PS_O_IP(192, 168, 1, 99);
-byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 }
+byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
+
+IPAddress ip;
+byte mac[sizeof(PS_T_MAC)];
 
 /*************** MQTT TOPICS ***************/
-const char* T1_TOPIC = "phoneSoap/t1";
-const char* T2_TOPIC = "phoneSoap/t2";
-const char* T3_TOPIC = "phoneSoap/t3";
-const char* T4_TOPIC = "phoneSoap/t4";
+const char* T1_TOPIC = "phoneSoap/PS_T1";
+const char* T2_TOPIC = "phoneSoap/PS_T2";
+const char* T3_TOPIC = "phoneSoap/PS_T3";
+const char* T4_TOPIC = "phoneSoap/PS_T4";
 
-const char* W1_TOPIC = "phoneSoap/w1";
-const char* W2_TOPIC = "phoneSoap/w2";
-const char* W3_TOPIC = "phoneSoap/w3";
-const char* W4_TOPIC = "phoneSoap/w4";
+const char* W1_TOPIC = "phoneSoap/PS_W1";
+const char* W2_TOPIC = "phoneSoap/PS_W2";
+const char* W3_TOPIC = "phoneSoap/PS_W3";
+const char* W4_TOPIC = "phoneSoap/PS_W4";
 
-const char* O1_TOPIC = "phoneSoap/o1";
-const char* O2_TOPIC = "phoneSoap/o2";
-const char* O3_TOPIC = "phoneSoap/o3";
-const char* O4_TOPIC = "phoneSoap/o4";
+const char* O1_TOPIC = "phoneSoap/PS_O1";
+const char* O2_TOPIC = "phoneSoap/PS_O2";
+const char* O3_TOPIC = "phoneSoap/PS_O3";
+const char* O4_TOPIC = "phoneSoap/PS_O4";
+
+char* STATION;
+char PS1_TOPIC;
+char PS2_TOPIC;
+char PS3_TOPIC;
+char PS4_TOPIC;
 
 /******** MQTT PHONE SOAP STATIONS *********/
 /*
@@ -49,30 +58,29 @@ const char* STATION_T = "PS_T";
 // const char* STATION_O = "PS_O";
 
 #if defined(STATION_T)
-  #define STATION STATION_T;
-  #define ip PS_T_IP;
-  #define mac PS_T_MAC;
-  const char* STATION = STATION_T;
-  const char* PS1_TOPIC = T1_TOPIC;
-  const char* PS2_TOPIC = T2_TOPIC;
-  const char* PS3_TOPIC = T3_TOPIC;
-  const char* PS4_TOPIC = T4_TOPIC;
+  STATION = STATION_T;
+  ip = PS_T_IP;
+  mac[] = PS_T_MAC;
+  PS1_TOPIC = T1_TOPIC;
+  PS2_TOPIC = T2_TOPIC;
+  PS3_TOPIC = T3_TOPIC;
+  PS4_TOPIC = T4_TOPIC;
 #elif defined(STATION_W)
-  #define STATION STATION_W;
-  #define ip PS_W_IP;
-  #define mac PS_W_MAC;
-  const char* PS1_TOPIC = W1_TOPIC;
-  const char* PS2_TOPIC = W2_TOPIC;
-  const char* PS3_TOPIC = W3_TOPIC;
-  const char* PS4_TOPIC = W4_TOPIC;
+  STATION = STATION_W;
+  ip = PS_W_IP;
+  mac[] = PS_W_MAC;
+  PS1_TOPIC = W1_TOPIC;
+  PS2_TOPIC = W2_TOPIC;
+  PS3_TOPIC = W3_TOPIC;
+  PS4_TOPIC = W4_TOPIC;
 #elif defined(STATION_O)
-  #define STATION STATION_O;
-  #define ip PS_O_IP;
-  #define mac PS_O_MAC;
-  const char* PS1_TOPIC = O1_TOPIC;
-  const char* PS2_TOPIC = O2_TOPIC;
-  const char* PS3_TOPIC = O3_TOPIC;
-  const char* PS4_TOPIC = O4_TOPIC;
+  STATION = STATION_O;
+  ip = PS_O_IP;
+  mac[] = PS_O_MAC;
+  PS1_TOPIC = O1_TOPIC;
+  PS2_TOPIC = O2_TOPIC;
+  PS3_TOPIC = O3_TOPIC;
+  PS4_TOPIC = O4_TOPIC;
 #endif
 
 
@@ -110,7 +118,7 @@ const char stations[NUM_STATIONS][10] = {PS1_TOPIC, PS2_TOPIC, PS3_TOPIC, PS4_TO
 const char states[2][10] = {"ACTIVE", "IDLE"};
 
 // Put the current states into an array for indexing
-int currentStates[NUM_STATIONS] = {PS1_currentState, PS2_currentState, PS3_currentState, PS4_currentState, R2_currentState, R3_currentState};
+int currentStates[NUM_STATIONS] = {PS1_currentState, PS2_currentState, PS3_currentState, PS4_currentState};
 
 // Put the pins into arrays for indexing
 const int sensorPins[NUM_STATIONS] = {PS1_sensorPin, PS2_sensorPin, PS3_sensorPin, PS4_sensorPin};
@@ -124,7 +132,7 @@ void reconnect() {
     if (mqttClient.connect(STATION)) {
         Serial.println("Connected!");
         // Once connected, publish an announcement...
-        mqttClient.publish(CLIENT_ID, "CONNECTED");
+        mqttClient.publish(STATION, "CONNECTED");
 
         // Subscribe to each station topic
         for (int i = 0; i < NUM_STATIONS; i++) {
@@ -140,10 +148,39 @@ void reconnect() {
   }
 }
 
-void messageReceived(char* topic, byte* payload, unsigned int length) {
-  Serial.println("incoming: " + topic + " - " + payload);
+boolean reconnect_non_blocking() {
+  if (mqttClient.connect(STATION)) {
+    Serial.println("Connected!");
+    // Once connected, publish an announcement...
+    mqttClient.publish(STATION, "CONNECTED");
+
+    // Subscribe to each station topic
+    for (int i = 0; i < NUM_STATIONS; i++) {
+      mqttClient.subscribe(stations[i]);
+    }
+  } else {
+    Serial.print("failed, rc=");
+    Serial.print(mqttClient.state());
+  }
+  return mqttClient.connected();
 }
 
+void messageReceived(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);  
+  Serial.println("] ");
+  char payloadArr[length+1];
+  
+  for (unsigned int i=0;i<length;i++)
+  {
+    payloadArr[i] = (char)payload[i];
+  }
+  payloadArr[length] = 0;
+
+  Serial.println(payloadArr);  // null terminated array
+}
+
+long lastReconnectAttempt = 0;
 void setup() {
   // Initialize serial communication:
   Serial.begin(9600);
@@ -159,13 +196,22 @@ void setup() {
     pinMode(activePins[i], OUTPUT);
     currentStates[i] = IDLE_STATE;
   }
+  lastReconnectAttempt = 0;
 }
 
 void loop() {
   if (!mqttClient.connected()) {
-    reconnect();
+    long now = millis();
+    if (now - lastReconnectAttempt > 5000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (reconnect_non_blocking()) {
+        lastReconnectAttempt = 0;
+      }
+    }
+  } else {
+    mqttClient.loop();
   }
-  mqttClient.loop();
 
   // Run each statin through the state machine
   for (int i = 0; i < NUM_STATIONS; i++) {
@@ -198,7 +244,7 @@ void stateMachine (int pos) {
 #endif
     currentStates[pos] = lastTempState[pos];
     // Publish the message for this station. i.e. client.publish("PS1", "ACTIVE")
-    client.publish(stations[pos], states[currentStates[pos]]);
+    if (mqttClient.connected()) mqttClient.publish(stations[pos], states[currentStates[pos]]);
   }
   switch (currentStates[pos]) {
     case ACTIVE_STATE:
@@ -219,5 +265,9 @@ void setIdle (int pos) {
 }
 
 int getState(int pos) {
+  if (pos == 0) {
+    Serial.print("Sensor 1");
+    Serial.println(analogRead(sensorPins[pos]));
+  }
   return digitalRead(sensorPins[pos]) == HIGH ? ACTIVE_STATE : IDLE_STATE;
 }
