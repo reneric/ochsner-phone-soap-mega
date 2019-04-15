@@ -2,6 +2,8 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
+#define DEBUG 1;
+
 /************* PRESENCE STATES *************/
 #define ACTIVE_STATE 0
 #define IDLE_STATE 1
@@ -224,7 +226,7 @@ void loop() {
 int lastTempState[NUM_STATIONS];
 void stateMachine (int pos) {
   // Get the current sensor state
-  lastTempState[pos] = getState(pos);
+  int tempState = getState(pos);
   
   /*
    * Only send the state update on the first loop.
@@ -233,16 +235,16 @@ void stateMachine (int pos) {
    * THEN we can safely change the actual state and broadcast it.
    *
    */
-  if (lastTempState[pos] != currentStates[pos]) {
+  if (tempState != currentStates[pos]) {
 #if DEBUG == 1    
     Serial.print("Sensor State Changed: ");
     Serial.println(stations[pos]);
     Serial.print("Last State: ");
     Serial.println(currentStates[pos]);
     Serial.print("New State: ");
-    Serial.println(lastTempState[pos]);
+    Serial.println(tempState);
 #endif
-    currentStates[pos] = lastTempState[pos];
+    currentStates[pos] = tempState;
     // Publish the message for this station. i.e. client.publish("PS1", "ACTIVE")
     if (mqttClient.connected()) mqttClient.publish(stations[pos], states[currentStates[pos]]);
   }
@@ -265,9 +267,11 @@ void setIdle (int pos) {
 }
 
 int getState(int pos) {
+#if DEBUG == 1
   if (pos == 0) {
     Serial.print("Sensor 1");
     Serial.println(analogRead(sensorPins[pos]));
   }
+#endif
   return digitalRead(sensorPins[pos]) == HIGH ? ACTIVE_STATE : IDLE_STATE;
 }
