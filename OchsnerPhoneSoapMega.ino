@@ -299,11 +299,21 @@ void stateMachine (int pos) {
 
 /********* SET GIVEN STATION PIN TO ACTIVE *********/
 void setActive (int pos) {
+#if DEBUG == 1
+  if (pos == 0) {
+    Serial.print("Set ACTIVE: " + PS1_TOPIC);
+  }
+#endif
   digitalWrite(activePins[pos], HIGH);
 }
 
 /********** SET GIVEN STATION PIN TO IDLE **********/
 void setIdle (int pos) {
+#if DEBUG == 1
+  if (pos == 0) {
+    Serial.print("Set IDLE: " + PS1_TOPIC);
+  }
+#endif
   digitalWrite(activePins[pos], LOW);
 }
 
@@ -311,7 +321,7 @@ void setIdle (int pos) {
 int getState(int pos) {
 #if DEBUG == 1
   if (pos == 0) {
-    Serial.print("Sensor 1");
+    Serial.print(PS1_TOPIC + " State: ");
     Serial.println(analogRead(sensorPins[pos]));
   }
 #endif
