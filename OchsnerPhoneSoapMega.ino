@@ -280,12 +280,14 @@ void stateMachine (int pos) {
    */
   if (tempState != currentState) {
 #if DEBUG == 1
-    Serial.print("Sensor State Changed: ");
-    Serial.println(stations[pos]);
-    Serial.print("Last State: ");
-    Serial.println(currentState);
-    Serial.print("New State: ");
-    Serial.println(tempState);
+    if (pos == 0) {
+      Serial.print("Sensor State Changed: ");
+      Serial.println(stations[pos]);
+      Serial.print("Last State: ");
+      Serial.println(currentState);
+      Serial.print("New State: ");
+      Serial.println(tempState);
+    }
 #endif
     currentStates[pos] = tempState;
     // Publish the message for this station. i.e. client.publish("PS1", "ACTIVE")
