@@ -2,11 +2,11 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
-#define DEBUG 1;
+#define DEBUG 1
 
 /********************* PRESENCE STATES ********************/
-#define ACTIVE_STATE 0
-#define IDLE_STATE 1
+#define ACTIVE_STATE 1
+#define IDLE_STATE 0
 
 /*
  *
@@ -207,7 +207,7 @@ void messageReceived(char* topic, byte* payload, unsigned int length) {
   // Terminate array with null value
   payloadArr[length] = 0;
 
-  Serial.println(payloadArr);
+  Serial.println(payloadArr);\
 }
 
 void setup() {
@@ -216,10 +216,10 @@ void setup() {
 
   // Initialize the ethernet connection
   Ethernet.begin(mac, ip);
-  Serial.print("Ethernet connection initialized with IP Address: ");
-  Serial.print(ip);
-  Serial.print(", and MAC Address: ");
-  Serial.println(mac);
+  // Serial.print("Ethernet connection initialized with IP Address: ");
+  // Serial.print(ip);
+  // Serial.print(", and MAC Address: ");
+  // Serial.println(mac);
 
   // Initialize the MQTT connection
   mqttClient.setServer(mqttServer, mqttPort);
@@ -265,7 +265,10 @@ void stateMachine (int pos) {
   // Get the current sensor state
   int tempState = getState(pos);
 #if DEBUG == 1
-  if (pos == 1) Serial.println("PS1 state: " + states[tempState[pos]])
+  if (pos == 1) {
+    Serial.print("PS1 state: ");
+    Serial.println(states[tempState]);
+  }
 #endif
   /*
    * Only send the state update on the first loop.
