@@ -264,6 +264,7 @@ void loop() {
 void stateMachine (int pos) {
   // Get the current sensor state
   int tempState = getState(pos);
+  int currentState = currentStates[pos]; 
 #if DEBUG == 1
   if (pos == 1) {
     Serial.print("PS1 state: ");
@@ -277,12 +278,12 @@ void stateMachine (int pos) {
    * THEN we can safely change the actual state and broadcast it.
    *
    */
-  if (tempState != currentStates[pos]) {
+  if (tempState != currentState) {
 #if DEBUG == 1
     Serial.print("Sensor State Changed: ");
     Serial.println(stations[pos]);
     Serial.print("Last State: ");
-    Serial.println(currentStates[pos]);
+    Serial.println(currentState);
     Serial.print("New State: ");
     Serial.println(tempState);
 #endif
@@ -304,7 +305,7 @@ void stateMachine (int pos) {
 void setActive (int pos) {
 #if DEBUG == 1
   if (pos == 0) {
-    Serial.print("Set ACTIVE: " + PS1_TOPIC);
+    Serial.println("Set ACTIVE: " + PS1_TOPIC);
   }
 #endif
   digitalWrite(activePins[pos], HIGH);
@@ -314,7 +315,7 @@ void setActive (int pos) {
 void setIdle (int pos) {
 #if DEBUG == 1
   if (pos == 0) {
-    Serial.print("Set IDLE: " + PS1_TOPIC);
+    Serial.println("Set IDLE: " + PS1_TOPIC);
   }
 #endif
   digitalWrite(activePins[pos], LOW);
@@ -328,5 +329,5 @@ int getState(int pos) {
     Serial.println(analogRead(sensorPins[pos]));
   }
 #endif
-  return digitalRead(sensorPins[pos]) == HIGH ? ACTIVE_STATE : IDLE_STATE;
+  return analogRead(sensorPins[pos]) > 600 ? ACTIVE_STATE : IDLE_STATE;
 }
