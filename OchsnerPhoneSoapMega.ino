@@ -17,14 +17,14 @@
 
 /********************* MQTT CONNECTION ********************/
 const int mqttPort = 1883;
-const char* mqttServer = "192.168.2.101";
+const char* mqttServer = "192.168.2.10";
 
 /******************* NETWORK CONNECTION *******************/
-IPAddress PS_T_IP(192, 168, 1, 97);
+IPAddress PS_T_IP(192, 168, 1, 102);
 byte PS_T_MAC[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
-IPAddress PS_W_IP(192, 168, 1, 98);
+IPAddress PS_W_IP(192, 168, 1, 103);
 byte PS_W_MAC[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 };
-IPAddress PS_O_IP(192, 168, 1, 99);
+IPAddress PS_O_IP(192, 168, 1, 104);
 byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
 
 IPAddress ip;
