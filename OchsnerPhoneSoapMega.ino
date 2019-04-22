@@ -312,7 +312,7 @@ void stateMachine (int pos) {
 /********* SET GIVEN STATION PIN TO ACTIVE *********/
 void setActive (int pos) {
 #if DEBUG == 1
-  
+  if (pos == 0) {
     Serial.println("Set ACTIVE: PS1");
   }
 #endif
