@@ -272,7 +272,7 @@ void stateMachine (int pos) {
 #if DEBUG == 1
   if (pos == 0) {
     Serial.print("PS1 state: ");
-    Serial.println(getState(pos));
+    Serial.println(tempState[pos]);
     Serial.println(states[tempState[pos]]);
     Serial.println("");
   }
@@ -336,7 +336,7 @@ int getState(int pos) {
     Serial.print("Input: ");
     Serial.print(pos);
     Serial.print(" ");
-    Serial.println(analogRead(sensorPins[pos]));
+    Serial.println(digitalRead(sensorPins[pos]));
   // }
 #endif
   return digitalRead(sensorPins[pos]) == HIGH;
