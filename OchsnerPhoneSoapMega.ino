@@ -264,6 +264,7 @@ void loop() {
 }
 
 int tempState[NUM_STATIONS];
+/********* STATE DECISION MAKER *********/
 void stateMachine (int pos) {
   // Get the current sensor state
   tempState[pos] = getState(pos);
@@ -311,7 +312,7 @@ void stateMachine (int pos) {
 /********* SET GIVEN STATION PIN TO ACTIVE *********/
 void setActive (int pos) {
 #if DEBUG == 1
-  if (pos == 0) {
+  
     Serial.println("Set ACTIVE: PS1");
   }
 #endif
@@ -331,10 +332,12 @@ void setIdle (int pos) {
 /****** GET STATE OF STATIONS PHONE SOAP PIN *******/
 int getState(int pos) {
 #if DEBUG == 1
-  if (pos == 0) {
-    Serial.print("PS1 Input: ");
-    Serial.println(digitalRead(sensorPins[pos]) == HIGH);
-  }
+  // if (pos == 0) {
+    Serial.print("Input: ");
+    Serial.print(pos);
+    Serial.print(" ");
+    Serial.println(analogRead(sensorPins[pos]));
+  // }
 #endif
   return digitalRead(sensorPins[pos]) == HIGH;
 }
