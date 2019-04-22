@@ -17,7 +17,7 @@
 
 /********************* MQTT CONNECTION ********************/
 const int mqttPort = 1883;
-const char* mqttServer = "192.168.2.10";
+const char* mqttServer = "192.168.2.101";
 
 /******************* NETWORK CONNECTION *******************/
 IPAddress PS_T_IP(192, 168, 1, 97);
