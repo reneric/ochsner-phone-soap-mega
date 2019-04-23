@@ -21,18 +21,6 @@ const int mqttPort = 1883;
 const char* mqttServer = "192.168.1.89";
 // const char* mqttServer = "192.168.2.10";
 
-/******************* NETWORK CONNECTION *******************/
-
-IPAddress PS_T_IP(192, 168, 1, 99);
-// IPAddress PS_T_IP(192, 168, 2, 102);
-byte PS_T_MAC[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
-IPAddress PS_W_IP(192, 168, 2, 103);
-byte PS_W_MAC[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 };
-IPAddress PS_O_IP(192, 168, 2, 104);
-byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
-
-// IPAddress ip;
-// byte mac[sizeof(PS_T_MAC)];
 
 /*********************** MQTT TOPICS **********************/
 #define T1_TOPIC "PS_T1"
@@ -54,15 +42,6 @@ byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
 #define PS_Q_STATE_TOPIC "command/PS_Q"
 
 
-/******** Initialize phone soap station topics ***********/
-// char* STATION;
-// char PS1_TOPIC;
-// char PS2_TOPIC;
-// char PS3_TOPIC;
-// char PS4_TOPIC;
-// char PS_STATE_TOPIC;
-
-
 /*
  * MQTT PHONE SOAP STATIONS
  *
@@ -70,9 +49,8 @@ byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
  *
  */
 #define STATION_T "PS_T"
-// char* STATION_T = "PS_T";
-// const char* STATION_W = "PS_W";
-// const char* STATION_O = "PS_O";
+// #define STATION_W "PS_W"
+// #define STATION_O "PS_O"
 
 
 /*
@@ -85,7 +63,8 @@ byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
 #if defined(STATION_T)
   #define STATION STATION_T
   byte mac[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
-  IPAddress ip(192, 168, 1, 97);
+  // IPAddress ip(192, 168, 1, 97);
+  IPAddress ip(192, 168, 2, 102);
   #define PS1_TOPIC T1_TOPIC
   #define PS2_TOPIC T2_TOPIC
   #define PS3_TOPIC T3_TOPIC
