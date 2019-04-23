@@ -2,11 +2,12 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 /********************* PRESENCE STATES ********************/
 #define ACTIVE_STATE 1
 #define IDLE_STATE 0
+#define OFF_STATE 0
 
 /*
  *
@@ -17,43 +18,49 @@
 
 /********************* MQTT CONNECTION ********************/
 const int mqttPort = 1883;
-const char* mqttServer = "192.168.2.10";
+const char* mqttServer = "192.168.1.89";
+// const char* mqttServer = "192.168.2.10";
 
 /******************* NETWORK CONNECTION *******************/
-IPAddress PS_T_IP(192, 168, 2, 102);
+
+IPAddress PS_T_IP(192, 168, 1, 99);
+// IPAddress PS_T_IP(192, 168, 2, 102);
 byte PS_T_MAC[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
 IPAddress PS_W_IP(192, 168, 2, 103);
 byte PS_W_MAC[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 };
 IPAddress PS_O_IP(192, 168, 2, 104);
 byte PS_O_MAC[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
 
-IPAddress ip;
-byte mac[sizeof(PS_T_MAC)];
+// IPAddress ip;
+// byte mac[sizeof(PS_T_MAC)];
 
 /*********************** MQTT TOPICS **********************/
-const char* T1_TOPIC = "phoneSoap/PS_T1";
-const char* T2_TOPIC = "phoneSoap/PS_T2";
-const char* T3_TOPIC = "phoneSoap/PS_T3";
-const char* T4_TOPIC = "phoneSoap/PS_T4";
+#define T1_TOPIC "PS_T1"
+#define T2_TOPIC "PS_T2"
+#define T3_TOPIC "PS_T3"
+#define T4_TOPIC "PS_T4"
+#define PS_T_STATE_TOPIC "command/PS_T"
 
-const char* W1_TOPIC = "phoneSoap/PS_W1";
-const char* W2_TOPIC = "phoneSoap/PS_W2";
-const char* W3_TOPIC = "phoneSoap/PS_W3";
-const char* W4_TOPIC = "phoneSoap/PS_W4";
+#define W1_TOPIC "PS_W1"
+#define W2_TOPIC "PS_W2"
+#define W3_TOPIC "PS_W3"
+#define W4_TOPIC "PS_W4"
+#define PS_W_STATE_TOPIC "command/PS_W"
 
-const char* O1_TOPIC = "phoneSoap/PS_O1";
-const char* O2_TOPIC = "phoneSoap/PS_O2";
-const char* O3_TOPIC = "phoneSoap/PS_O3";
-const char* O4_TOPIC = "phoneSoap/PS_O4";
+#define O1_TOPIC "PS_O1"
+#define O2_TOPIC "PS_O2"
+#define O3_TOPIC "PS_O3"
+#define O4_TOPIC "PS_O4"
+#define PS_Q_STATE_TOPIC "command/PS_Q"
 
 
 /******** Initialize phone soap station topics ***********/
-char* STATION;
-char PS1_TOPIC;
-char PS2_TOPIC;
-char PS3_TOPIC;
-char PS4_TOPIC;
-
+// char* STATION;
+// char PS1_TOPIC;
+// char PS2_TOPIC;
+// char PS3_TOPIC;
+// char PS4_TOPIC;
+// char PS_STATE_TOPIC;
 
 
 /*
@@ -62,7 +69,8 @@ char PS4_TOPIC;
  * Set station below (REQUIRED)
  *
  */
-const char* STATION_T = "PS_T";
+#define STATION_T "PS_T"
+// char* STATION_T = "PS_T";
 // const char* STATION_W = "PS_W";
 // const char* STATION_O = "PS_O";
 
@@ -75,45 +83,51 @@ const char* STATION_T = "PS_T";
  *
  */
 #if defined(STATION_T)
-  STATION = STATION_T;
-  ip = PS_T_IP;
-  mac[] = PS_T_MAC;
-  PS1_TOPIC = T1_TOPIC;
-  PS2_TOPIC = T2_TOPIC;
-  PS3_TOPIC = T3_TOPIC;
-  PS4_TOPIC = T4_TOPIC;
+  #define STATION STATION_T
+  byte mac[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
+  IPAddress ip(192, 168, 1, 97);
+  #define PS1_TOPIC T1_TOPIC
+  #define PS2_TOPIC T2_TOPIC
+  #define PS3_TOPIC T3_TOPIC
+  #define PS4_TOPIC T4_TOPIC
+  #define PS_STATE_TOPIC PS_T_STATE_TOPIC
 #elif defined(STATION_W)
-  STATION = STATION_W;
-  ip = PS_W_IP;
-  mac[] = PS_W_MAC;
-  PS1_TOPIC = W1_TOPIC;
-  PS2_TOPIC = W2_TOPIC;
-  PS3_TOPIC = W3_TOPIC;
-  PS4_TOPIC = W4_TOPIC;
+  #define STATION STATION_W
+  IPAddress ip(192, 168, 2, 103);
+  byte mac[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 };
+  #define PS1_TOPIC W1_TOPIC
+  #define PS2_TOPIC W2_TOPIC
+  #define PS3_TOPIC W3_TOPIC
+  #define PS4_TOPIC W4_TOPIC
+  #define PS_STATE_TOPIC PS_W_STATE_TOPIC
 #elif defined(STATION_O)
-  STATION = STATION_O;
-  ip = PS_O_IP;
-  mac[] = PS_O_MAC;
-  PS1_TOPIC = O1_TOPIC;
-  PS2_TOPIC = O2_TOPIC;
-  PS3_TOPIC = O3_TOPIC;
-  PS4_TOPIC = O4_TOPIC;
+  #define STATION STATION_O
+  IPAddress ip(192, 168, 2, 104);
+  byte mac[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
+  #define PS1_TOPIC O1_TOPIC
+  #define PS2_TOPIC O2_TOPIC
+  #define PS3_TOPIC O3_TOPIC
+  #define PS4_TOPIC O4_TOPIC
+  #define PS_STATE_TOPIC PS_Q_STATE_TOPIC
 #endif
-
 
 
 /********************** STATION PINS *********************/
 const int PS1_sensorPin = 23; // The phone soap input pin for PS1 (INPUT)
-const int PS1_activePin = 22; // The ACTIVE state pin to trigger the PS1 matrix/teensy (OUTPUT)
+const int PS1_activePin = 22; // The ACTIVE state pin to trigger the PS1 teensy (OUTPUT)
+const int PS1_statePin = 40;  // The pin to trigger the PS1 teensy state (ON/OFF) (OUTPUT)
 
 const int PS2_sensorPin = 25; // The phone soap input pin for PS2 (INPUT)
-const int PS2_activePin = 24; // The ACTIVE state pin to trigger the PS2 matrix/teensy (OUTPUT)
+const int PS2_activePin = 24; // The ACTIVE state pin to trigger the PS2 teensy (OUTPUT)
+const int PS2_statePin = 41;  // The pin to trigger the PS2 teensy state (ON/OFF) (OUTPUT)
 
 const int PS3_sensorPin = 27; // The phone soap input pin for PS3 (INPUT)
-const int PS3_activePin = 26; // The ACTIVE state pin to trigger the PS3 matrix/teensy (OUTPUT)
+const int PS3_activePin = 26; // The ACTIVE state pin to trigger the PS3 teensy (OUTPUT)
+const int PS3_statePin = 42;  // The pin to trigger the PS3 teensy state (ON/OFF) (OUTPUT)
 
 const int PS4_sensorPin = 29; // The phone soap input pin for PS4 (INPUT)
-const int PS4_activePin = 28; // The ACTIVE state pin to trigger the PS4 matrix/teensy (OUTPUT)
+const int PS4_activePin = 28; // The ACTIVE state pin to trigger the PS4 teensy (OUTPUT)
+const int PS4_statePin = 43;  // The pin to trigger the PS4 teensy state (ON/OFF) (OUTPUT)
 
 
 /**************** INITIALIZE CURRENT STATE ***************/
@@ -121,7 +135,8 @@ int PS1_currentState;
 int PS2_currentState;
 int PS3_currentState;
 int PS4_currentState;
-
+int PS_state;
+int tempState[NUM_STATIONS];
 
 
 /************** INITIALIZE ETHERNET LIBRARY *************/
@@ -133,12 +148,12 @@ PubSubClient mqttClient(net);
 
 
 /********* STATION NAMES (used as MQTT Topics) **********/
-const char stations[NUM_STATIONS][10] = {PS1_TOPIC, PS2_TOPIC, PS3_TOPIC, PS4_TOPIC};
+const char stations[NUM_STATIONS][20] = {PS1_TOPIC, PS2_TOPIC, PS3_TOPIC, PS4_TOPIC};
 
 /******* STATION STATES (used as MQTT Messages) *********/
 const char states[2][10] = {"IDLE", "ACTIVE"};
 
-
+const char toggleTopics[1][20] = {PS_STATE_TOPIC};
 
 /****** Put the states into an array for indexing *******/
 int currentStates[NUM_STATIONS] = {PS1_currentState, PS2_currentState, PS3_currentState, PS4_currentState};
@@ -146,6 +161,7 @@ int currentStates[NUM_STATIONS] = {PS1_currentState, PS2_currentState, PS3_curre
 /******* Put the pins into an array for indexing ********/
 const int sensorPins[NUM_STATIONS] = {PS1_sensorPin, PS2_sensorPin, PS3_sensorPin, PS4_sensorPin};
 const int activePins[NUM_STATIONS] = {PS1_activePin, PS2_activePin, PS3_activePin, PS4_activePin};
+const int statePins[NUM_STATIONS] = {PS1_statePin, PS2_statePin, PS3_statePin, PS4_statePin};
 
 
 
@@ -177,17 +193,18 @@ void reconnect() {
 long lastReconnectAttempt = 0;
 boolean reconnect_non_blocking() {
   if (mqttClient.connect(STATION)) {
-    Serial.println("Connected!");
+    Serial.println("CONNECTED");
     // Once connected, publish an announcement...
     mqttClient.publish(STATION, "CONNECTED");
 
+    mqttClient.subscribe(toggleTopics[0]);
     // Subscribe to each station topic
     for (int i = 0; i < NUM_STATIONS; i++) {
       mqttClient.subscribe(stations[i]);
     }
   } else {
     Serial.print("failed, rc=");
-    Serial.print(mqttClient.state());
+    Serial.println(mqttClient.state());
   }
   return mqttClient.connected();
 }
@@ -206,8 +223,12 @@ void messageReceived(char* topic, byte* payload, unsigned int length) {
 
   // Terminate array with null value
   payloadArr[length] = 0;
-
-  Serial.println(payloadArr);\
+  Serial.println(payloadArr);
+  
+  if (strcmp(topic, toggleTopics[0]) == 0) {
+    if (strcmp(payloadArr, "stop") == 0) PS_state = 0;
+    if (strcmp(payloadArr, "start") == 0) PS_state = 1;
+  }
 }
 
 void setup() {
@@ -216,10 +237,8 @@ void setup() {
 
   // Initialize the ethernet connection
   Ethernet.begin(mac, ip);
-  // Serial.print("Ethernet connection initialized with IP Address: ");
-  // Serial.print(ip);
-  // Serial.print(", and MAC Address: ");
-  // Serial.println(mac);
+  Serial.print("Ethernet connection initialized with IP Address: ");
+  Serial.println(ip);
 
   // Initialize the MQTT connection
   mqttClient.setServer(mqttServer, mqttPort);
@@ -234,36 +253,45 @@ void setup() {
   for (int i = 0; i < NUM_STATIONS; i++) {
     pinMode(sensorPins[i], INPUT_PULLUP);
     pinMode(activePins[i], OUTPUT);
+    pinMode(statePins[i], OUTPUT);
     currentStates[i] = IDLE_STATE;
   }
-  pinMode(PS1_sensorPin, INPUT);
-  pinMode(PS1_activePin, OUTPUT);
   lastReconnectAttempt = 0;
+  PS_state = 0;
 }
 
 void loop() {
-  // if (!mqttClient.connected()) {
-  //   long now = millis();
-  //   if (now - lastReconnectAttempt > 5000) {
-  //     lastReconnectAttempt = now;
-  //     // Attempt to reconnect
-  //     if (reconnect_non_blocking()) {
-  //       lastReconnectAttempt = 0;
-  //     }
-  //   }
-  // } else {
-  //   mqttClient.loop();
-  // }
+  if (!mqttClient.connected()) {
+    long now = millis();
+    if (now - lastReconnectAttempt > 1000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (reconnect_non_blocking()) {
+        lastReconnectAttempt = 0;
+      }
+    }
+  } else {
+    mqttClient.loop();
+  }
+  
+  // Turns all phone soap LEDs ON/OFF
+  stateToggle(PS_state);
 
   // Run each statin through the state machine
   for (int i = 0; i < NUM_STATIONS; i++) {
     stateMachine(i);
   }
+
   // Small delay to keep things stable
   delay(100);
 }
 
-int tempState[NUM_STATIONS];
+void stateToggle (int toggle) {
+  for (int i = 0; i < NUM_STATIONS; i++) {
+    digitalWrite(statePins[i], toggle);
+  }
+}
+
 /********* STATE DECISION MAKER *********/
 void stateMachine (int pos) {
   // Get the current sensor state
@@ -297,7 +325,7 @@ void stateMachine (int pos) {
 #endif
     currentStates[pos] = tempState[pos];
     // Publish the message for this station. i.e. client.publish("PS1", "ACTIVE")
-    if (mqttClient.connected()) mqttClient.publish(stations[pos], states[currentStates[pos]]);
+    if (mqttClient.connected()) mqttClient.publish("PS_T1", states[currentStates[pos]]);
   }
   switch (currentStates[pos]) {
     case ACTIVE_STATE:
