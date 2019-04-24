@@ -7,7 +7,6 @@
 /********************* PRESENCE STATES ********************/
 #define ACTIVE_STATE 1
 #define IDLE_STATE 0
-#define OFF_STATE 0
 
 /*
  *
@@ -18,8 +17,8 @@
 
 /********************* MQTT CONNECTION ********************/
 const int mqttPort = 1883;
-// const char* mqttServer = "192.168.1.89";
-const char* mqttServer = "192.168.2.10";
+const char* mqttServer = "192.168.1.97";
+// const char* mqttServer = "192.168.2.10";
 
 
 /*********************** MQTT TOPICS **********************/
@@ -62,10 +61,9 @@ const char* mqttServer = "192.168.2.10";
  */
 #if defined(STATION_T)
   #define STATION STATION_T
-  byte mac[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
-  // IPAddress ip(192, 168, 1, 97);
-
-  IPAddress ip(192, 168, 2, 102);
+  byte mac[] = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xEE };
+  IPAddress ip(192, 168, 1, 82);
+  // IPAddress ip(192, 168, 2, 102);
   #define PS1_TOPIC T1_TOPIC
   #define PS2_TOPIC T2_TOPIC
   #define PS3_TOPIC T3_TOPIC
@@ -153,7 +151,7 @@ void reconnect() {
     if (mqttClient.connect(STATION)) {
         Serial.println("Connected!");
         // Once connected, publish an announcement...
-        mqttClient.publish(STATION, "CONNECTED");
+        mqttClient.publish(STATION, "CONNECTED", true);
 
         // Subscribe to each station topic
         for (int i = 0; i < NUM_STATIONS; i++) {
@@ -175,7 +173,7 @@ boolean reconnect_non_blocking() {
   if (mqttClient.connect(STATION)) {
     Serial.println("CONNECTED");
     // Once connected, publish an announcement...
-    mqttClient.publish(STATION, "CONNECTED");
+    mqttClient.publish(STATION, "CONNECTED", true);
 
     mqttClient.subscribe(toggleTopics[0]);
     // Subscribe to each station topic
@@ -209,6 +207,8 @@ void messageReceived(char* topic, byte* payload, unsigned int length) {
     if (strcmp(payloadArr, "stop") == 0) PS_state = 0;
     if (strcmp(payloadArr, "start") == 0) PS_state = 1;
   }
+  Serial.print("PS_state: ");
+  Serial.println(PS_state);
 }
 
 void setup() {
@@ -267,6 +267,8 @@ void loop() {
 }
 
 void stateToggle (int toggle) {
+  Serial.print("TOGGLE: ");
+  Serial.println(toggle);
   for (int i = 0; i < NUM_STATIONS; i++) {
     digitalWrite(statePins[i], toggle);
   }
@@ -304,8 +306,8 @@ void stateMachine (int pos) {
     }
 #endif
     currentStates[pos] = tempState[pos];
-    // Publish the message for this station. i.e. client.publish("PS1", "ACTIVE")
-    if (mqttClient.connected()) mqttClient.publish("PS_T1", states[currentStates[pos]]);
+    // Publish the message for this station. i.e. client.publish("PS1", "ACTIVE", true);
+    if (mqttClient.connected()) mqttClient.publish(stations[pos], states[currentStates[pos]], true);
   }
   switch (currentStates[pos]) {
     case ACTIVE_STATE:
