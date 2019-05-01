@@ -17,8 +17,8 @@
 
 /********************* MQTT CONNECTION ********************/
 const int mqttPort = 1883;
-const char* mqttServer = "192.168.1.97";
-// const char* mqttServer = "192.168.2.10";
+// const char* mqttServer = "192.168.1.97";
+const char* mqttServer = "192.168.2.10";
 
 
 /*********************** MQTT TOPICS **********************/
@@ -61,9 +61,9 @@ const char* mqttServer = "192.168.1.97";
  */
 #if defined(STATION_T)
   #define STATION STATION_T
-  byte mac[] = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xEE };
-  IPAddress ip(192, 168, 1, 82);
-  // IPAddress ip(192, 168, 2, 102);
+  byte mac[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
+  // IPAddress ip(192, 168, 1, 82);
+  IPAddress ip(192, 168, 2, 102);
   #define PS1_TOPIC T1_TOPIC
   #define PS2_TOPIC T2_TOPIC
   #define PS3_TOPIC T3_TOPIC
