@@ -38,7 +38,7 @@ const char* mqttServer = "192.168.2.10";
 #define O2_TOPIC "PS_O2"
 #define O3_TOPIC "PS_O3"
 #define O4_TOPIC "PS_O4"
-#define PS_Q_STATE_TOPIC "command/PS_Q"
+#define PS_O_STATE_TOPIC "command/PS_O"
 
 
 /*
@@ -61,7 +61,7 @@ const char* mqttServer = "192.168.2.10";
  */
 #if defined(STATION_T)
   #define STATION STATION_T
-  byte mac[] = { 0x75, 0xF0, 0x62, 0xC2, 0xAD, 0x09 };
+  byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEB };
   // IPAddress ip(192, 168, 1, 82);
   IPAddress ip(192, 168, 2, 102);
   #define PS1_TOPIC T1_TOPIC
@@ -72,7 +72,7 @@ const char* mqttServer = "192.168.2.10";
 #elif defined(STATION_W)
   #define STATION STATION_W
   IPAddress ip(192, 168, 2, 103);
-  byte mac[] = { 0xAB, 0x93, 0x0A, 0xDF, 0x7B, 0x81 };
+  byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEC };
   #define PS1_TOPIC W1_TOPIC
   #define PS2_TOPIC W2_TOPIC
   #define PS3_TOPIC W3_TOPIC
@@ -81,12 +81,12 @@ const char* mqttServer = "192.168.2.10";
 #elif defined(STATION_O)
   #define STATION STATION_O
   IPAddress ip(192, 168, 2, 104);
-  byte mac[] = { 0x44, 0xA0, 0x99, 0x11, 0xFA, 0x93 };
+  byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF };
   #define PS1_TOPIC O1_TOPIC
   #define PS2_TOPIC O2_TOPIC
   #define PS3_TOPIC O3_TOPIC
   #define PS4_TOPIC O4_TOPIC
-  #define PS_STATE_TOPIC PS_Q_STATE_TOPIC
+  #define PS_STATE_TOPIC PS_O_STATE_TOPIC
 #endif
 
 
