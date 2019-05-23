@@ -4,6 +4,8 @@
 
 #define DEBUG 0
 
+// #define LOCAL true
+
 /********************* PRESENCE STATES ********************/
 #define ACTIVE_STATE 1
 #define IDLE_STATE 0
@@ -16,9 +18,12 @@
 #define NUM_STATIONS 4
 
 /********************* MQTT CONNECTION ********************/
-const int mqttPort = 1883;
-// const char* mqttServer = "192.168.1.97";
+#ifdef LOCAL
+const char* mqttServer = "192.168.1.97";
+#else
 const char* mqttServer = "192.168.2.10";
+#endif
+const int mqttPort = 1883;
 
 
 /*********************** MQTT TOPICS **********************/
